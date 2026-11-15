@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход · ОТО</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/style-premium.css">
+</head>
+<body class="auth-page auth-starting">
+<section class="boot-screen auth-startup" id="authStartup" role="status" aria-live="polite" aria-label="Запуск ОТО">
+  <div class="boot-frame">
+    <header class="boot-header">
+      <div class="boot-brand"><span class="boot-mark">ОТО</span><span>Оперативное техническое обслуживание<small>АЭРОПОРТОВЫЕ ОПЕРАЦИИ · DESKTOP</small></span></div>
+      <span class="boot-version">SYSTEM · READY</span>
+    </header>
+    <div class="boot-main">
+      <div class="boot-map" aria-hidden="true">
+        <svg viewBox="0 0 720 240" role="presentation">
+          <path class="boot-runway" d="M24 177H696" />
+          <path class="boot-taxiway" d="M80 177V74H240V142H392V42H618V177" />
+          <path class="boot-taxiway-secondary" d="M240 142V210M392 42V22M504 42V74" />
+          <path class="boot-route" id="authBootRoute" d="M80 177V74H240V142H392V42H618V177" />
+          <circle class="boot-node" cx="80" cy="177" r="6"/><circle class="boot-node" cx="240" cy="142" r="6"/>
+          <circle class="boot-node" cx="392" cy="42" r="6"/><circle class="boot-node" cx="618" cy="177" r="6"/>
+          <circle class="boot-courier" r="5"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#authBootRoute"/></animateMotion></circle>
+        </svg>
+        <div class="boot-map-label boot-label-base">БАЗА ТЕХНИКОВ</div><div class="boot-map-label boot-label-stand">СТОЯНКА</div>
+      </div>
+      <div class="boot-copy"><span class="boot-kicker">АЭРОПОРТОВЫЕ ОПЕРАЦИИ</span>
+        <h1>Оперативная<br>смена начинается.</h1>
+        <div class="boot-progress"><span id="authBootProgress"></span></div>
+        <p id="authBootStatus">Запускаем рабочее пространство…</p>
+        <div class="boot-stages"><span data-auth-stage="0" class="active">СИСТЕМА</span><i></i><span data-auth-stage="1">ДОСТУП</span><i></i><span data-auth-stage="2">ГОТОВО</span></div>
+      </div>
+    </div>
+    <footer class="boot-footer"><span>ОТО · ДИСПЕТЧЕРСКИЙ ЦЕНТР</span><span>ПРИБЫТИЕ ИНЖЕНЕРА <b>15:00</b></span></footer>
+  </div>
+</section>
+<main class="auth-layout">
+  <section class="auth-brand">
+    <img class="auth-map" src="/static/login-map.svg" alt="Схема перрона Шереметьево">
+    <div class="auth-brand-top">
+      <div class="logo" aria-hidden="true">ОТО</div>
+      <div>
+        <b>ОТО, диспетчеризация</b>
+        <small>Шереметьево, перрон</small>
+      </div>
+    </div>
+    <div class="auth-pitch">
+      <h1>Смена начинается на перроне.</h1>
+      <p>Заявка, ближайший инженер и маршрут по рулёжным дорожкам — на одной карте. Норматив прибытия — 15 минут.</p>
+    </div>
+  </section>
+
+  <section class="auth-card">
+    <div class="auth-tabs" role="tablist" aria-label="Вход или регистрация">
+      <button type="button" class="on" data-auth-tab="login" role="tab">Вход</button>
+      <button type="button" data-auth-tab="register" role="tab">Регистрация инженера</button>
+    </div>
+
+    <div class="auth-form-wrap" id="loginPane">
+      <div class="auth-head">
+        <h2>Вход в смену</h2>
+        <p>Используйте рабочую почту и пароль, выданный при регистрации.</p>
+      </div>
+      <form id="loginForm" novalidate>
+        <label>Email
+          <input type="email" id="loginEmail" autocomplete="username" required placeholder="name@oto.ru">
+        </label>
+        <label>Пароль
+          <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+        <p class="form-message" id="loginMsg" hidden></p>
+        <button class="primary auth-submit" type="submit" id="loginSubmit">Войти</button>
+      </form>
+
+      <div class="demo-box" id="demoBox" hidden>
+        <div class="demo-title">Демо-доступ</div>
+        <div class="demo-grid">
+          <div><span>Диспетчер</span><code id="demoDispatcher"></code></div>
+          <div><span>Инженер</span><code id="demoEngineer"></code></div>
+        </div>
+        <div class="demo-actions">
+          <button type="button" id="demoDispatcherBtn">Войти как диспетчер</button>
+          <button type="button" id="demoEngineerBtn">Войти как инженер</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-form-wrap" id="registerPane" hidden>
+      <div class="auth-head">
+        <h2>Регистрация инженера</h2>
+        <p>После отправки заявки диспетчер проверит квалификацию и допустит к смене.</p>
+      </div>
+      <form id="registerForm" novalidate>
+        <label>Имя и фамилия
+          <input type="text" id="regName" autocomplete="name" required placeholder="Иванов Пётр">
+        </label>
+        <label>Email
+          <input type="email" id="regEmail" autocomplete="email" required placeholder="name@oto.ru">
+        </label>
+        <label>Пароль
+          <input type="password" id="regPassword" autocomplete="new-password" required minlength="8" placeholder="Минимум 8 символов">
+        </label>
+        <div class="form-row">
+          <label>Квалификация
+            <select id="regQual" required></select>
+          </label>
+          <label>База
+            <select id="regBase" required></select>
+          </label>
+        </div>
+        <fieldset class="types-field">
+          <legend>Допуски на типы ВС</legend>
+          <div class="type-chips" id="typeChips"></div>
+        </fieldset>
+        <p class="form-message" id="registerMsg" hidden></p>
+        <button class="primary auth-submit" type="submit" id="registerSubmit">Отправить заявку</button>
+      </form>
+    </div>
+
+    <div class="auth-success" id="successPane" hidden>
+      <div class="success-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.5"/></svg></div>
+      <h2>Заявка отправлена</h2>
+      <p>Диспетчер проверит данные. После подтверждения вы сможете войти с указанным email и паролем.</p>
+      <button type="button" class="primary" id="successLogin">Перейти ко входу</button>
+    </div>
+
+    <footer class="auth-foot">
+      <span>Карты: © участники OpenStreetMap (ODbL)</span>
+      <a href="/healthz">Статус сервера</a>
+    </footer>
+  </section>
+</main>
+<script src="/static/auth.js"></script>
+</body>
+</html>

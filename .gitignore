@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+dispatch.db
+raw_*.json
+*.osm
+node_modules/
+.desktop-build/
+src-tauri/target/
+src-tauri/resources/server/airport-crm-server*

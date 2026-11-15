@@ -1,0 +1,17 @@
+pkgname=airport-crm
+pkgver=0.1.0
+pkgrel=9
+pkgdesc='ОТО · Операционный центр для аэропортовых служб'
+arch=('x86_64')
+license=('custom')
+depends=('webkit2gtk-4.1' 'gtk3')
+options=('!strip')
+source=()
+sha256sums=()
+
+package() {
+  local bundle="$startdir/../src-tauri/target/release/bundle/deb/ОТО · Операционный центр_0.1.0_amd64/data.tar.gz"
+  [[ -f "$bundle" ]] || { echo "Build the Tauri deb first: $bundle" >&2; return 1; }
+  tar --no-same-owner -xzf "$bundle" --directory="$pkgdir"
+  install -Dm644 "$startdir/../LICENSE" "$pkgdir/usr/share/licenses/airport-crm/LICENSE"
+}

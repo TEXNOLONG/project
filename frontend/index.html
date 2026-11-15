@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ОТО · диспетчерская</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="/static/style-premium.css">
+</head>
+<body class="dispatcher">
+
+<section class="boot-screen" id="bootScreen" role="status" aria-live="polite" aria-label="Запуск ОТО">
+  <div class="boot-frame">
+    <header class="boot-header">
+      <div class="boot-brand"><span class="boot-mark">ОТО</span><span>Оперативное техническое обслуживание<small>ДИСПЕТЧЕРСКАЯ · SVO / UUEE</small></span></div>
+      <span class="boot-version">DESKTOP · 01</span>
+    </header>
+    <div class="boot-main">
+      <div class="boot-map" aria-hidden="true">
+        <svg viewBox="0 0 720 240" role="presentation">
+          <path class="boot-runway" d="M24 177H696" />
+          <path class="boot-taxiway" d="M80 177V74H240V142H392V42H618V177" />
+          <path class="boot-taxiway-secondary" d="M240 142V210M392 42V22M504 42V74" />
+          <path class="boot-route" id="bootRoute" d="M80 177V74H240V142H392V42H618V177" />
+          <circle class="boot-node" cx="80" cy="177" r="6"/><circle class="boot-node" cx="240" cy="142" r="6"/>
+          <circle class="boot-node" cx="392" cy="42" r="6"/><circle class="boot-node" cx="618" cy="177" r="6"/>
+          <circle class="boot-courier" r="5"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#bootRoute"/></animateMotion></circle>
+        </svg>
+        <div class="boot-map-label boot-label-base">БАЗА ТЕХНИКОВ</div><div class="boot-map-label boot-label-stand">СТОЯНКА</div>
+      </div>
+      <div class="boot-copy"><span class="boot-kicker">РАБОЧЕЕ ПРОСТРАНСТВО ДИСПЕТЧЕРА</span>
+        <h1>Смена начинается<br>с полной картины.</h1>
+        <div class="boot-progress"><span id="bootProgress"></span></div>
+        <p id="bootStatus">Проверяем доступ и загружаем смену…</p>
+        <div class="boot-stages"><span data-stage="0" class="active">СЕССИЯ</span><i></i><span data-stage="1">КАРТА</span><i></i><span data-stage="2">СМЕНА</span></div>
+        <button class="boot-retry" id="bootRetry" type="button" hidden>Повторить запуск</button>
+      </div>
+    </div>
+    <footer class="boot-footer"><span>ОТО · АЭРОПОРТОВЫЕ ОПЕРАЦИИ</span><span>НОРМАТИВ ПРИБЫТИЯ <b>15:00</b></span></footer>
+  </div>
+</section>
+
+<a class="skip-link" href="#map">Перейти к карте</a>
+
+<svg id="map" xmlns="http://www.w3.org/2000/svg" aria-label="Карта перрона Шереметьево"></svg>
+<canvas id="map3d" hidden aria-label="3D-карта перрона"></canvas>
+<div class="map-vignette" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">ОТО</div>
+    <div>
+      <h1>Диспетчерская</h1>
+      <span id="airportName" class="muted">Шереметьево, перрон</span>
+    </div>
+  </div>
+
+  <button class="mobile-menu" id="menuBtn" type="button" aria-label="Открыть очередь">Очередь</button>
+
+  <section class="stats" id="stats" aria-label="Показатели смены"></section>
+
+  <div class="controls">
+    <span class="llm-pill" id="llmPill" title="Генератор карточек рейсов">Модель <b id="llmModel">—</b></span>
+    <span class="norm-pill" title="Норматив прибытия инженера">Норматив <b>15:00</b></span>
+    <label title="Скорость модельного времени">
+      <select id="speed" class="dispatcher-only" aria-label="Скорость модельного времени">
+        <option value="1">×1</option><option value="5">×5</option>
+        <option value="10" selected>×10</option><option value="30">×30</option>
+        <option value="60">×60</option>
+      </select>
+    </label>
+    <button id="simToggle" class="sim-toggle" type="button" aria-pressed="true" aria-label="Приостановить симуляцию">
+      <svg class="sim-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4.5v11M13 4.5v11"/></svg>
+      <svg class="sim-play" viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4.5 9 5.5-9 5.5z"/></svg>
+      <span id="simToggleText">Пауза</span>
+    </button>
+    <div class="user-chip" id="userChip" title="Текущая учётная запись">
+      <span class="user-avatar" id="userAvatar">Д</span>
+      <span class="user-meta"><b id="userName">Диспетчер</b><small id="userRole">смена</small></span>
+      <button class="user-logout" id="logoutBtn" type="button" title="Выйти из системы">Выйти</button>
+    </div>
+    <span id="conn" class="conn off" title="Связь с сервером" aria-label="Связь с сервером"></span>
+    <button class="app-settings" id="appSettings" type="button" aria-label="Настройки приложения" title="Настройки приложения">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"/><path d="m19.4 15 .08.08a1.7 1.7 0 0 1-2.4 2.4l-.08-.08a1.7 1.7 0 0 0-2.9 1.2v.15a1.7 1.7 0 0 1-3.4 0v-.12a1.7 1.7 0 0 0-2.9-1.2l-.08.08a1.7 1.7 0 0 1-2.4-2.4l.08-.08a1.7 1.7 0 0 0-1.2-2.9h-.15a1.7 1.7 0 0 1 0-3.4h.12a1.7 1.7 0 0 0 1.2-2.9l-.08-.08a1.7 1.7 0 0 1 2.4-2.4l.08.08a1.7 1.7 0 0 0 2.9-1.2v-.15a1.7 1.7 0 0 1 3.4 0v.12a1.7 1.7 0 0 0 2.9 1.2l.08-.08a1.7 1.7 0 0 1 2.4 2.4l-.08.08a1.7 1.7 0 0 0 1.2 2.9h.15a1.7 1.7 0 0 1 0 3.4h-.12a1.7 1.7 0 0 0-1.2 2.9Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<aside class="left-panel" id="leftPanel" aria-label="Очередь и списки смены">
+  <div class="side-head">
+    <div class="side-head-row">
+      <button class="primary dispatcher-only" id="newBtn" type="button">Новая заявка</button>
+      <button class="secondary dispatcher-only" id="newAcBtn" type="button" title="Создать входящий рейс">+ Рейс</button>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Разделы смены">
+      <button type="button" data-tab="active" class="on">Заявки <span id="cActive"></span></button>
+      <button type="button" data-tab="flights">Рейсы <span id="cFlights"></span></button>
+      <button type="button" data-tab="techs">Инженеры <span id="cReg"></span></button>
+      <button type="button" data-tab="log">Журнал</button>
+    </nav>
+  </div>
+  <div class="pane on" id="pane-active"></div>
+  <div class="pane" id="pane-flights"></div>
+  <div class="pane" id="pane-techs"></div>
+  <div class="pane" id="pane-log"></div>
+</aside>
+
+<aside class="right-panel" id="detailPanel" aria-label="Детали выбранной заявки"></aside>
+
+<div class="map-hud" aria-label="Состояние карты">
+  <span class="map-live"><i></i><b>LIVE</b></span>
+  <span class="map-hud-divider"></span>
+  <span class="map-hud-airport" id="mapHudAirport">SVO · UUEE</span>
+  <span class="map-hud-fleet" id="vehicleCount">Транспорт · загрузка…</span>
+</div>
+
+<div class="legend" id="legend" aria-label="Обозначения на карте">
+  <span><i style="background:var(--glider)"></i>Планер</span>
+  <span><i style="background:var(--engine)"></i>Двигатель</span>
+  <span><i style="background:var(--avionics)"></i>Авионика</span>
+  <span class="sep"></span>
+  <span><i style="background:var(--yellow)"></i>Маршрут</span>
+  <span><i style="background:var(--red)"></i>ЧС</span>
+  <span class="sep"></span>
+  <span class="legend-vehicle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 14 1.5-5h11L19 14v4H5zM7 9l1.2-3h7.6L17 9M7 18v1m10-1v1"/></svg>Машина инженера</span>
+</div>
+
+<div class="map-scale" aria-label="Масштаб карты">
+  <div class="map-north" title="Север"><svg viewBox="0 0 20 28" aria-hidden="true"><path d="M10 2 4 17l6-3 6 3L10 2Z"/><path d="M10 14v11"/></svg><span>N</span></div>
+  <span class="map-scale-rule" id="mapScaleLine"></span><b id="mapScaleLabel">—</b>
+</div>
+
+<div class="map-tools" aria-label="Управление картой">
+  <button id="view3d" type="button" title="Переключить 2D / 3D" aria-label="Переключить 2D / 3D">3D</button>
+  <button id="zin" type="button" title="Приблизить" aria-label="Приблизить">+</button>
+  <button id="zout" type="button" title="Отдалить" aria-label="Отдалить">−</button>
+  <button id="zfit" type="button" title="Весь аэропорт" aria-label="Весь аэропорт"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7M5.5 9v11h13V9M9.5 20v-6h5v6"/></svg></button>
+</div>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <h2>Новая заявка</h2>
+    <label>Борт на стоянке
+      <select id="fStand" required></select>
+      <small id="fFlightInfo" class="muted"></small>
+    </label>
+    <label>Квалификация
+      <select id="fQual">
+        <option value="auto">Определить по описанию</option>
+        <option>Планер</option><option>Двигатель</option><option>Авионика</option>
+      </select>
+    </label>
+    <label>Что случилось
+      <textarea id="fDesc" rows="3" required placeholder="Например: вибрация правого двигателя на запуске"></textarea>
+    </label>
+    <label>Дополнительно
+      <input id="fExtra" type="text" placeholder="Сообщение экипажа, рейс, примечания">
+    </label>
+    <label class="check"><input type="checkbox" id="fEm"> Чрезвычайная ситуация</label>
+    <p class="err" id="fErr" hidden></p>
+    <div class="row">
+      <button type="button" id="fCancel">Отмена</button>
+      <button type="submit" class="primary">Создать заявку</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="settingsDlg" class="settings-dialog" aria-labelledby="settingsTitle">
+  <form method="dialog" class="settings-form">
+    <header><div><span class="settings-kicker">ОТО · DESKTOP</span><h2 id="settingsTitle">Настройки</h2></div><button class="settings-close" aria-label="Закрыть настройки">×</button></header>
+    <label class="setting-row"><span><b>Вид карты при запуске</b><small>Сохраняется на этом компьютере</small></span>
+      <select id="startupView"><option value="2d">Двухмерная карта</option><option value="3d">Трёхмерная карта</option></select>
+    </label>
+    <div class="setting-row"><span><b>Папка данных</b><small>Заявки, журнал и учётные записи</small></span><span class="setting-value">Локальная база приложения</span></div>
+    <div class="setting-row"><span><b>Аэропорт</b><small id="settingsAirport">Загрузка…</small></span><span class="setting-value">SVO · UUEE</span></div>
+    <footer><span>Оформление: тёмная тема</span><button class="primary" value="close">Готово</button></footer>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/static/map3d.js"></script>
+<script src="/static/desktop.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

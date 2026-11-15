@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F3F0E7">
+<title>Инженер · ОТО</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="engineer-page">
+
+<header class="eng-top glass">
+  <div class="eng-brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="25" height="25">
+        <path d="M20 3 L23 15 L36 22 L36 26 L23 22 L22 30 L28 34 L28 37 L20 35 L12 37 L12 34 L18 30 L17 22 L4 26 L4 22 L17 15 Z"
+              fill="#C2603F"/>
+      </svg>
+    </div>
+    <div>
+      <b>ОТО · Инженер</b>
+      <small id="engAirport">Смена</small>
+    </div>
+  </div>
+  <div class="eng-top-actions">
+    <span class="eng-conn" id="engConn"><i></i><span>Связь</span></span>
+    <button class="eng-icon-btn" id="engRefresh" title="Обновить" aria-label="Обновить">↻</button>
+    <button class="eng-logout" id="engLogout">Выйти</button>
+  </div>
+</header>
+
+<main class="eng-main">
+  <section class="eng-hero">
+    <div>
+      <div class="eng-eyebrow">Личный кабинет инженера</div>
+      <h1 id="engName">Загрузка…</h1>
+      <p class="eng-sub" id="engSub">—</p>
+    </div>
+    <div class="eng-avatar" id="engAvatar">И</div>
+  </section>
+
+  <section class="eng-stats" id="engStats"></section>
+
+  <section class="eng-grid">
+    <div class="eng-main-col">
+      <section class="eng-card">
+        <div class="eng-card-head">
+          <div>
+            <h2>Мои задачи</h2>
+            <p id="engTaskHint">Активные назначения и этапы работы</p>
+          </div>
+          <span class="eng-live-dot" title="Синхронизация по WebSocket"></span>
+        </div>
+        <div id="engTasks"></div>
+      </section>
+
+      <section class="eng-card">
+        <div class="eng-card-head">
+          <div>
+            <h2>Маршрут</h2>
+            <p>Положение и путь до стоянки</p>
+          </div>
+        </div>
+        <div class="eng-map-wrap">
+          <svg id="engMap" viewBox="0 0 600 260" role="img" aria-label="Маршрут инженера"></svg>
+          <div class="eng-map-empty" id="engMapEmpty">Нет активного маршрута</div>
+        </div>
+      </section>
+
+      <section class="eng-card">
+        <div class="eng-card-head">
+          <div>
+            <h2>История</h2>
+            <p>Последние выполненные заявки</p>
+          </div>
+        </div>
+        <div id="engHistory"></div>
+      </section>
+    </div>
+
+    <aside class="eng-side">
+      <section class="eng-card">
+        <div class="eng-card-head">
+          <div>
+            <h2>Смена</h2>
+            <p>События по вашим заявкам</p>
+          </div>
+        </div>
+        <div class="eng-events" id="engEvents"></div>
+      </section>
+      <section class="eng-note">
+        <b>Норматив 15 минут</b>
+        <span>Время считается от создания заявки до прибытия инженера на стоянку.</span>
+      </section>
+    </aside>
+  </section>
+</main>
+
+<div id="engToast" class="toast" hidden></div>
+<script src="/static/engineer.js"></script>
+</body>
+</html>

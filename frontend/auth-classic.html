@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход · ОТО</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="auth-page">
+<main class="auth-layout">
+  <section class="auth-brand">
+    <div class="auth-brand-top">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="31" height="31">
+          <path d="M20 3 L23 15 L36 22 L36 26 L23 22 L22 30 L28 34 L28 37 L20 35 L12 37 L12 34 L18 30 L17 22 L4 26 L4 22 L17 15 Z"
+                fill="#C2603F"/>
+        </svg>
+      </div>
+      <div>
+        <div class="auth-eyebrow">Аэрофлот · ОТО</div>
+        <div class="auth-product">Диспетчеризация смены</div>
+      </div>
+    </div>
+
+    <div class="auth-pitch">
+      <h1>Один борт.<br>Один инженер.<br>Пятнадцать минут.</h1>
+      <p>Единая смена для диспетчеров и инженеров: задания, маршруты,
+         статусы и подтверждения — в реальном времени.</p>
+    </div>
+
+    <ul class="auth-features">
+      <li><b>Диспетчер</b><span>видит борт, стоянку и свободных инженеров</span></li>
+      <li><b>Инженер</b><span>получает задание, маршрут и отмечает этапы</span></li>
+      <li><b>Синхронизация</b><span>изменения приходят на все устройства сразу</span></li>
+    </ul>
+
+    <div class="demo-box" id="demoBox" hidden>
+      <div class="demo-title">Демо-доступ</div>
+      <div class="demo-grid">
+        <div><span>Диспетчер</span><code id="demoDispatcher"></code></div>
+        <div><span>Инженер</span><code id="demoEngineer"></code></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="auth-card glass">
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="on" data-auth-tab="login" role="tab">Вход</button>
+      <button type="button" data-auth-tab="register" role="tab">Регистрация инженера</button>
+    </div>
+
+    <div class="auth-form-wrap" id="loginPane">
+      <div class="auth-head">
+        <h2>Вход в смену</h2>
+        <p>Используйте рабочую почту и пароль, выданный при регистрации.</p>
+      </div>
+      <form id="loginForm" novalidate>
+        <label>Email
+          <input type="email" id="loginEmail" autocomplete="username" required placeholder="name@oto.ru">
+        </label>
+        <label>Пароль
+          <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+        <p class="form-message" id="loginMsg" hidden></p>
+        <button class="primary auth-submit" type="submit" id="loginSubmit">Войти</button>
+      </form>
+    </div>
+
+    <div class="auth-form-wrap" id="registerPane" hidden>
+      <div class="auth-head">
+        <h2>Регистрация инженера</h2>
+        <p>После отправки заявки диспетчер проверит квалификацию и допустит к смене.</p>
+      </div>
+      <form id="registerForm" novalidate>
+        <label>Имя и фамилия
+          <input type="text" id="regName" autocomplete="name" required placeholder="Иванов Пётр">
+        </label>
+        <label>Email
+          <input type="email" id="regEmail" autocomplete="email" required placeholder="name@oto.ru">
+        </label>
+        <label>Пароль
+          <input type="password" id="regPassword" autocomplete="new-password" required minlength="8" placeholder="Минимум 8 символов">
+        </label>
+        <div class="form-row">
+          <label>Квалификация
+            <select id="regQual" required></select>
+          </label>
+          <label>База
+            <select id="regBase" required></select>
+          </label>
+        </div>
+        <fieldset class="types-field">
+          <legend>Допуски на типы ВС</legend>
+          <div class="type-chips" id="typeChips"></div>
+        </fieldset>
+        <p class="form-message" id="registerMsg" hidden></p>
+        <button class="primary auth-submit" type="submit" id="registerSubmit">Отправить заявку</button>
+      </form>
+    </div>
+
+    <div class="auth-success" id="successPane" hidden>
+      <div class="success-mark">✓</div>
+      <h2>Заявка отправлена</h2>
+      <p>Диспетчер проверит данные. После подтверждения вы сможете войти
+         с указанным email и паролем.</p>
+      <button type="button" class="primary" id="successLogin">Перейти ко входу</button>
+    </div>
+
+    <footer class="auth-foot">
+      <span>Карты: © участники OpenStreetMap (ODbL)</span>
+      <a href="/healthz">Статус сервера</a>
+    </footer>
+  </section>
+</main>
+<script src="/static/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аэрофлот · Умная диспетчеризация ОТО</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dispatcher">
+
+<svg id="map" xmlns="http://www.w3.org/2000/svg" aria-label="Карта перрона"></svg>
+<canvas id="map3d" hidden aria-label="3D-карта перрона"></canvas>
+<div class="map-vignette" aria-hidden="true"></div>
+
+<header class="top glass">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 40 40" width="28" height="28">
+        <path d="M20 3 L23 15 L36 22 L36 26 L23 22 L22 30 L28 34 L28 37 L20 35 L12 37 L12 34 L18 30 L17 22 L4 26 L4 22 L17 15 Z"
+              fill="#C2603F"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Диспетчер ОТО</h1>
+      <span id="airportName" class="muted"></span>
+    </div>
+  </div>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="controls">
+    <span class="llm-pill" id="llmPill" title="Провайдер генерации карточек рейсов">LLM <b id="llmModel">—</b></span>
+    <span class="norm-pill" title="Регламент 15 минут">Норматив <b>15:00</b></span>
+    <label title="Скорость модельного времени">
+      <select id="speed" class="dispatcher-only">
+        <option value="1">×1</option><option value="5">×5</option>
+        <option value="10" selected>×10</option><option value="30">×30</option>
+        <option value="60">×60</option>
+      </select>
+    </label>
+    <div class="user-chip" id="userChip" title="Текущая учётная запись">
+      <span class="user-avatar" id="userAvatar">Д</span>
+      <span class="user-meta"><b id="userName">Диспетчер</b><small id="userRole">смена</small></span>
+      <button class="user-logout" id="logoutBtn" title="Выйти из системы">Выйти</button>
+    </div>
+    <span id="conn" class="conn off" title="Связь с сервером"></span>
+  </div>
+</header>
+
+<aside class="left-panel glass" id="leftPanel">
+  <div class="side-head">
+    <div class="side-head-row">
+      <button class="primary dispatcher-only" id="newBtn">Создать заявку</button>
+      <button class="dispatcher-only" id="newAcBtn" title="Создать входящий рейс">+ Рейс</button>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="board" class="on">Табло</button>
+      <button data-tab="active">Активные <span id="cActive"></span></button>
+      <button data-tab="flights">Рейсы <span id="cFlights"></span></button>
+      <button data-tab="techs">Техники <span id="cReg"></span></button>
+      <button data-tab="log">Журнал</button>
+    </nav>
+  </div>
+  <div class="pane on" id="pane-board"></div>
+  <div class="pane" id="pane-active"></div>
+  <div class="pane" id="pane-flights"></div>
+  <div class="pane" id="pane-techs"></div>
+  <div class="pane" id="pane-log"></div>
+</aside>
+
+<aside class="right-panel glass" id="detailPanel" hidden></aside>
+
+<div class="legend glass" id="legend">
+  <span><i style="background:var(--glider)"></i>Планер</span>
+  <span><i style="background:var(--engine)"></i>Двигатель</span>
+  <span><i style="background:var(--avionics)"></i>Авионика</span>
+  <span class="sep"></span>
+  <span><i style="background:var(--inbound)"></i>Прилёт</span>
+  <span><i style="background:var(--parked)"></i>На стоянке</span>
+  <span><i style="background:var(--departing)"></i>Вылет</span>
+  <span class="sep"></span>
+  <span><i style="background:var(--svc-fuel)"></i>Заправка</span>
+  <span><i style="background:var(--svc-catering)"></i>Питание</span>
+  <span><i style="background:var(--svc-baggage)"></i>Багаж</span>
+  <span><i style="background:var(--svc-cleaning)"></i>Уборка</span>
+  <span><i style="background:var(--svc-pushback)"></i>Pushback</span>
+</div>
+
+<div class="map-tools glass">
+  <button id="view3d" title="Переключить 2D / 3D">3D</button>
+  <button id="zin"  title="Приблизить">+</button>
+  <button id="zout" title="Отдалить">−</button>
+  <button id="zfit" title="Весь аэропорт">⌂</button>
+</div>
+
+<dialog id="dlg">
+  <form id="form">
+    <h2>Новая заявка</h2>
+    <label>Борт
+      <select id="fStand" required></select>
+      <small id="fFlightInfo" class="muted"></small>
+    </label>
+    <label>Квалификация
+      <select id="fQual">
+        <option value="auto">Определить по описанию</option>
+        <option>Планер</option><option>Двигатель</option><option>Авионика</option>
+      </select>
+    </label>
+    <label>Описание дефекта
+      <textarea id="fDesc" rows="3" required placeholder="Например: вибрация правого двигателя на запуске"></textarea>
+    </label>
+    <label>Дополнительно
+      <input id="fExtra" type="text" placeholder="Сообщение экипажа, рейс, примечания">
+    </label>
+    <label class="check"><input type="checkbox" id="fEm"> Чрезвычайная ситуация</label>
+    <p class="err" id="fErr" hidden></p>
+    <div class="row">
+      <button type="button" id="fCancel">Отмена</button>
+      <button type="submit" class="primary">Создать заявку</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" hidden></div>
+<script src="/static/map3d.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

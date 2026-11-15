@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ОТО · Операционный центр",
+  "version": "0.1.0",
+  "identifier": "ru.oto.airport-crm",
+  "build": {
+    "beforeDevCommand": "npm run ui:build",
+    "beforeBuildCommand": "npm run ui:build",
+    "frontendDist": "../frontend"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self' http://127.0.0.1:* ws://127.0.0.1:* data: blob:; img-src 'self' data: blob: http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' http://127.0.0.1:*; connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:*"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "category": "Business",
+    "shortDescription": "Airport technical operations desktop application",
+    "resources": {
+      "../run.py": "run.py",
+      "../backend/": "backend/",
+      "../data/": "data/",
+      "../frontend/": "frontend/",
+      "resources/server/": "server/"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "targets": "all"
+  }
+}
+
